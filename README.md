@@ -1,2 +1,2 @@
-# fashion-ann-pipeline
+# Fashion ANN Pipeline
 Run everything with dvc repro.
