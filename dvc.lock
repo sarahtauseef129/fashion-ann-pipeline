@@ -1,0 +1,88 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+    - path: src/prepare.py
+      hash: md5
+      md5: 15aa200fccd4d0ac549872957d32a4ab
+      size: 460
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 2d6688ff1de8ee382655f8ee24ace648.dir
+      size: 31220545
+      nfiles: 1
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 2d6688ff1de8ee382655f8ee24ace648.dir
+      size: 31220545
+      nfiles: 1
+    - path: src/preprocess.py
+      hash: md5
+      md5: 33ea42baaeea3d40b160624d504fdeb7
+      size: 1015
+    params:
+      params.yaml:
+        preprocess.seed: 42
+        preprocess.val_size: 0.1
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 808d3c678032f3073b72ede544ddd878.dir
+      size: 45205815
+      nfiles: 3
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 808d3c678032f3073b72ede544ddd878.dir
+      size: 45205815
+      nfiles: 3
+    - path: src/train.py
+      hash: md5
+      md5: f14b5fbaa2212694928984b128751857
+      size: 1189
+    params:
+      params.yaml:
+        train:
+          dense_units: 128
+          dropout_rate: 0.2
+          learning_rate: 0.001
+          epochs: 10
+          batch_size: 64
+          seed: 42
+    outs:
+    - path: models
+      hash: md5
+      md5: 393918ee58a076378e4de9b965554388.dir
+      size: 1246089
+      nfiles: 2
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/processed/test.npz
+      hash: md5
+      md5: d792438feb177786b28231599c2540ea
+      size: 6482464
+    - path: models/model.h5
+      hash: md5
+      md5: 1d35be88ddf2f1cbd577140eefac1bcf
+      size: 1245272
+    - path: src/evaluate.py
+      hash: md5
+      md5: 434e5d45e71c48f41f59cdfa4f7d289d
+      size: 1134
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 0e3c0999d3407f018affe698f9e59d4b
+      size: 80
+    - path: reports/confusion_matrix.png
+      hash: md5
+      md5: 41cc1bc9caca45005f6daa5a357d30fa
+      size: 74377
